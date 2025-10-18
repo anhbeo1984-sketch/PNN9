@@ -88,6 +88,12 @@
             font-weight: bold;
         }
         
+        /* CSS BỔ SUNG: Dùng để bôi màu đỏ cho trường Mã số thuế và Trạng thái nộp thuế */
+        .highlight-red {
+            color: #dc3545; /* Màu đỏ */
+            font-weight: bold;
+        }
+
         /* CSS cho hiệu ứng transparent/fade-in NHANH VÀ MƯỢT MÀ HƠN (0.8s) */
         #qr-guide-container {
             /* Đặt lại trạng thái ban đầu là ẩn và trong suốt */
@@ -139,6 +145,12 @@
         "Tổng số tiền phải nộp (bao gồm cả tiền chậm nộp)"
     ];
 
+    // MẢNG BỔ SUNG: Chứa tên các trường cần bôi màu đỏ
+    const RED_HIGHLIGHT_FIELDS = [
+        "Ma_so_thue", 
+        "Trạng thái nộp thuế"
+    ];
+
     function formatCurrency(value) {
         let numericValue = Number(value);
         if (!isNaN(numericValue) && numericValue !== null && numericValue !== undefined) {
@@ -185,15 +197,23 @@
                         for (const header in result) {
                             let displayValue = result[header];
                             let formattedOutput = '';
-                            let isCurrency = CURRENCY_FIELDS.includes(header.trim());
                             
+                            // 1. Kiểm tra trường có phải là tiền tệ không
+                            let isCurrency = CURRENCY_FIELDS.includes(header.trim());
                             if (isCurrency) {
                                 displayValue = formatCurrency(result[header]);
                             }
-                            
+
+                            // 2. Kiểm tra trường có cần bôi màu đỏ không
+                            let isRedHighlight = RED_HIGHLIGHT_FIELDS.includes(header.trim());
+
                             if (isCurrency) {
                                 formattedOutput = `<span class="currency-value">${displayValue}</span>`;
-                            } else {
+                            } else if (isRedHighlight) {
+                                // Áp dụng lớp highlight-red cho các trường MST và Trạng thái nộp thuế
+                                formattedOutput = `<span class="highlight-red">${displayValue}</span>`;
+                            } 
+                            else {
                                 formattedOutput = displayValue; 
                             }
 
